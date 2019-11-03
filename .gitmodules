@@ -1,0 +1,3 @@
+[submodule "orbitData/LISA-Like-Orbit"]
+	path = orbitData/LISA-Like-Orbit
+	url = https://github.com/gw4gw/LISA-Like-Orbit.git
