@@ -45,24 +45,24 @@ class Application():
         #波源列表
         self.sourceVar = tk.StringVar(self.windowTemplate)
         self.sourceVar.set(('EMRI','IMRI','SMBHB','Binary','Burst')) # 为变量设置值        
-        self.sourceList = tk.Listbox(self.windowTemplate, listvariable=self.sourceVar) 
+        self.sourceList = tk.Listbox(self.windowTemplate, listvariable=self.sourceVar, width=10, height=5) 
         self.sourceList.place(x=20, y=30, anchor='nw')
         #显示已选
         self.printVar = tk.StringVar(self.windowTemplate) 
         #确认按钮
-        self.verify = tk.Button(self.windowTemplate, text='确定', width=15, height=2, command= self.print_selection)
-        self.verify.place(x=25, y=155, anchor='nw')
+        self.verify = tk.Button(self.windowTemplate, text='确定', width=10, height=2, command= self.print_selection)
+        self.verify.place(x=20, y=125, anchor='nw')
   
 
         #显示
-        tk.Label(self.windowTemplate, text='Source Type',font=('Arial', 12)).place(x=180, y=10, anchor='nw')
+        tk.Label(self.windowTemplate, text='Source Type',font=('Arial', 12)).place(x=220, y=10, anchor='nw')
 
         self.display = tk.Label(self.windowTemplate, bg='green', fg='yellow',font=('Arial', 12), width=12, height=1,
             textvariable=self.printVar)
-        self.display.place(x=180, y=35, anchor='nw')
+        self.display.place(x=220, y=35, anchor='nw')
 
-        self.coeffSet0 = tk.Button(self.windowTemplate, text='参数设定', width=15, height=2, command=self.sourceSelectWarning)
-        self.coeffSet0.place(x=180, y=55, anchor='nw') # 占据位置
+        self.coeffSet0 = tk.Button(self.windowTemplate, text='参数设定', width=10, height=2, command=self.sourceSelectWarning)
+        self.coeffSet0.place(x=220, y=55, anchor='nw') # 占据位置
 
 
     def sourceEMRIset(self):
@@ -141,8 +141,8 @@ class Application():
                       'Burst' : self.sourceInConstruction}
 
             self.inputCommand = self.commandDict.get(self.selectValue)
-            self.coeffSet = tk.Button(self.windowTemplate, text='参数设定', width=15, height=2, command=self.inputCommand)
-            self.coeffSet.place(x=180, y=55, anchor='nw') # 覆盖原有按钮
+            self.coeffSet = tk.Button(self.windowTemplate, text='参数设定', width=10, height=2, command=self.inputCommand)
+            self.coeffSet.place(x=220, y=55, anchor='nw') # 覆盖原有按钮
         except Exception:
             self.sourceSelectWarning()
         
