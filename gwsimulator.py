@@ -55,14 +55,14 @@ class Application():
   
 
         #显示
-        tk.Label(self.windowTemplate, text='Source Type',font=('Arial', 12)).place(x=220, y=10, anchor='nw')
+        tk.Label(self.windowTemplate, text='Source Type',font=('Arial', 8), width=12, height=2).place(x=200, y=10, anchor='nw')
 
-        self.display = tk.Label(self.windowTemplate, bg='green', fg='yellow',font=('Arial', 12), width=12, height=1,
+        self.display = tk.Label(self.windowTemplate, bg='green', fg='yellow',font=('Arial', 10), width=12, height=1,
             textvariable=self.printVar)
-        self.display.place(x=220, y=35, anchor='nw')
+        self.display.place(x=200, y=35, anchor='nw')
 
         self.coeffSet0 = tk.Button(self.windowTemplate, text='参数设定', width=10, height=2, command=self.sourceSelectWarning)
-        self.coeffSet0.place(x=220, y=55, anchor='nw') # 占据位置
+        self.coeffSet0.place(x=200, y=55, anchor='nw') # 占据位置
 
 
     def sourceEMRIset(self):
@@ -142,7 +142,7 @@ class Application():
 
             self.inputCommand = self.commandDict.get(self.selectValue)
             self.coeffSet = tk.Button(self.windowTemplate, text='参数设定', width=10, height=2, command=self.inputCommand)
-            self.coeffSet.place(x=220, y=55, anchor='nw') # 覆盖原有按钮
+            self.coeffSet.place(x=200, y=55, anchor='nw') # 覆盖原有按钮
         except Exception:
             self.sourceSelectWarning()
         
