@@ -55,9 +55,9 @@ class Application():
   
 
         #显示
-        tk.Label(self.windowTemplate, text='Source Type',font=('Arial', 8), width=12, height=2).place(x=200, y=10, anchor='nw')
+        tk.Label(self.windowTemplate, text='Source Type',font=('Arial', 12), width=12, height=2).place(x=200, y=10, anchor='nw')
 
-        self.display = tk.Label(self.windowTemplate, bg='green', fg='yellow',font=('Arial', 10), width=12, height=1,
+        self.display = tk.Label(self.windowTemplate, bg='green', fg='yellow',font=('Arial', 12), width=12, height=1,
             textvariable=self.printVar)
         self.display.place(x=200, y=35, anchor='nw')
 
