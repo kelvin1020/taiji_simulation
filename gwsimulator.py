@@ -13,6 +13,9 @@ import numpy as np  #import numpy, and name it as np
 from lib.waveform import get_td_waveform
 import pandas as pd
 
+#绘图
+import matplotlib.pyplot as plt
+
 # Constants
 G = (const.G).value # gravitational constant
 C = (const.c).value # the speed of light
@@ -55,7 +58,6 @@ def WaveDataOut(**kwargs):
     waveData = pd.DataFrame(waveMat, columns = ['timeSecond', 'hp', 'hc'])
     waveData.to_csv('waveDataEMRI.dat')# columns=['JDTimeTCB']  #导出csv文件
     return waveData
-
 
 class Application():
     def __init__(self):
@@ -120,7 +122,7 @@ class Application():
     def sourceEMRIset(self):
             self.windowTemplateEMRI = tk.Toplevel(self.window)
             self.windowTemplateEMRI.title('EMRI参数设定')
-            self.windowTemplateEMRI.geometry('700x450')  # 这里的乘是小x 
+            self.windowTemplateEMRI.geometry('700x470')  # 这里的乘是小x 
 
             self.isWaveOK = tk.StringVar(self.windowTemplateEMRI) 
             self.isWaveOK.set('设定参数') 
@@ -207,20 +209,43 @@ class Application():
             self.displayWaveStatus.grid(row=6, column=4, padx=10, pady=10, ipadx=10, ipady=10)
 
             #绘图按钮
-            #self.plotWave = tk.Button(self.windowTemplateEMRI, text='参数设定', width=10, height=2, command=self.sourceSelectWarning)
-            #self.plotWave.grid(row=7, column=3, padx=10, pady=10, ipadx=10, ipady=10) # 占据位置
+            self.plotWave = tk.Button(self.windowTemplateEMRI, text='绘图', width=10, height=2, command=self.wavePlot)
+            self.plotWave.grid(row=7, column=3, padx=10, pady=10, ipadx=10, ipady=10) # 占据位置
 
-    #波形生成
+
+
+    def wavePlot(self):
+        '''
+        绘制波形
+        '''
+        try:
+            data  =  pd.read_csv('waveDataEMRI.dat', index_col = 0)
+            plt.figure()
+            plt.plot(data['timeSecond'], data['hp'], label = '$h_{+}$')
+            plt.plot(data['timeSecond'], data['hc'], label = '$h_{\\times}$')
+            # plt.xlim(0,8e3)
+            # plt.ylim(- 2e-22,2e-22)
+            plt.xlabel("Time / s")
+            plt.ylabel("Strain")
+            plt.legend()
+            plt.show()
+        except Exception as e:
+            self.warningInformation(e)
+
     def waveStatus(self, event):
+        '''
+        波形生成状态
+        '''
         try:
             self.isWaveOK.set('波形生成中') 
 
         except Exception as e:
             self.warningInformation(e)
 
-
-
     def waveform_making(self):
+        '''
+        波形生成
+        '''       
         try:
             MassBH = float(self.varMassBH.get()) 
             SpinxBH = float(self.varSpinxBH.get()) 
