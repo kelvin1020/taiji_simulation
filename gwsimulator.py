@@ -5,6 +5,58 @@
 import tkinter as tk  # 使用Tkinter前需要先导入
 import tkinter.messagebox as messagebox
 
+####teukolsky
+from lib.waveform import teukolsky
+from astropy import constants as const #import constants 
+import astropy.units as u              #import unit
+import numpy as np  #import numpy, and name it as np
+from lib.waveform import get_td_waveform
+import pandas as pd
+
+# Constants
+G = (const.G).value # gravitational constant
+C = (const.c).value # the speed of light
+
+
+def WaveDataOut(**kwargs):
+    #   Parameters
+    duration = 2.0**16.0         #信号持续时间(duration of signal) 2^16, 0.75d, 2^25 ,1.06yr
+    step = 4
+
+    atilde = np.sqrt(kwargs['SpinxBH']**2 + kwargs['SpinyBH']**2 + kwargs['SpinzBH']**2)  # 自旋参量
+    nu = kwargs['MassCO'] / kwargs['MassBH'] # 质量比? 对称质量比
+    M = ((kwargs['MassBH'] + kwargs['MassCO']) * const.M_sun).to(u.kg).value  #the mass of system, kilogram
+    # m = (1e1 * const.M_sun).to(u.kg).value  #the mass of small compact body, kilogram
+
+    l = np.arange(2,3)      
+    # m = 2
+    k = np.arange(-2,12,1)                   #the nth harmonic
+
+    ########################
+    R_unit = (G * M / C**2)#                #the unit length in G = C = 1 system, metre
+    # t_unit = R_unit / C    #                #the unit time in G = C = 1 system, second
+    ########################
+
+    e = kwargs['ECC']                                 #eccentricity of orbit
+    p = kwargs['PM']  * R_unit                         #semi-latus rectum
+
+    a = p / (1 - e**2)                      #the semi-major axis of orbit, metre
+
+    D = (1.00 * u.Gpc).to('m').value
+
+    wave = teukolsky(atilde = atilde, nu = nu, M = M, l = l, k = k, e = e, a = a, D = D)
+    wave.ecalculate(duration = duration, delta_t = step)
+    hp, hc = get_td_waveform(template=wave)
+
+    timeVec = (np.array(hp.sample_times)).reshape(-1, 1)
+    hpVec =  (np.array(hp)).reshape(-1, 1)
+    hcVec =  (np.array(hc)).reshape(-1, 1)
+    waveMat = np.concatenate((timeVec, hpVec, hcVec), axis = 1)
+    waveData = pd.DataFrame(waveMat, columns = ['timeSecond', 'hp', 'hc'])
+    waveData.to_csv('waveDataEMRI.dat')# columns=['JDTimeTCB']  #导出csv文件
+    return waveData
+
+
 class Application():
     def __init__(self):
         self.window = tk.Tk()
@@ -70,6 +122,10 @@ class Application():
             self.windowTemplateEMRI.title('EMRI参数设定')
             self.windowTemplateEMRI.geometry('700x450')  # 这里的乘是小x 
 
+            self.isWaveOK = tk.StringVar(self.windowTemplateEMRI) 
+            self.isWaveOK.set('设定参数') 
+
+            #波形参数
             self.varMassBH = tk.StringVar(self.windowTemplateEMRI) 
             self.varSpinxBH = tk.StringVar(self.windowTemplateEMRI) 
             self.varSpinyBH = tk.StringVar(self.windowTemplateEMRI) 
@@ -139,11 +195,31 @@ class Application():
             self.InputIOTA = tk.Entry(self.windowTemplateEMRI, textvariable=self.varIOTA, show=None, font=('Arial', 12), width=12)  # 显示成明文形式
             self.InputIOTA.grid(row=7, column=2, padx=10, pady=10, ipadx=10, ipady=10)
 
-            #确认按钮
-            self.coeffOK = tk.Button(self.windowTemplateEMRI, text='生成波形', width=10, height=2, command=self.waveform_making)
-            self.coeffOK.grid(row=6, column=4, padx=10, pady=10, ipadx=10, ipady=10)
+            #生成波形按钮 
+            self.coeffOK = tk.Button(self.windowTemplateEMRI, text='生成波形', width=10, height=2,\
+                command=self.waveform_making,state=tk.NORMAL)
+            self.coeffOK.grid(row=6, column=3, padx=10, pady=10, ipadx=10, ipady=10)
+            self.coeffOK.bind("<Button-1>", self.waveStatus)
+            
+            #状态显示
+            self.displayWaveStatus = tk.Label(self.windowTemplateEMRI, bg='green', fg='yellow',font=('Arial', 10), width=10, height=2,
+                textvariable=self.isWaveOK)
+            self.displayWaveStatus.grid(row=6, column=4, padx=10, pady=10, ipadx=10, ipady=10)
+
+            #绘图按钮
+            #self.plotWave = tk.Button(self.windowTemplateEMRI, text='参数设定', width=10, height=2, command=self.sourceSelectWarning)
+            #self.plotWave.grid(row=7, column=3, padx=10, pady=10, ipadx=10, ipady=10) # 占据位置
 
     #波形生成
+    def waveStatus(self, event):
+        try:
+            self.isWaveOK.set('波形生成中') 
+
+        except Exception as e:
+            self.warningInformation(e)
+
+
+
     def waveform_making(self):
         try:
             MassBH = float(self.varMassBH.get()) 
@@ -161,9 +237,18 @@ class Application():
             with open('./coeff.dat','w') as f:
                 print(MassBH, SpinxBH, SpinyBH, SpinzBH, MassCO, SpinxCO, SpinyCO, SpinzCO, ECC, PM, IOTA, file=f)
 
- 
+            kwargs = dict(MassBH=MassBH, SpinxBH=SpinxBH, SpinyBH=SpinyBH, SpinzBH=SpinzBH, \
+                MassCO=MassCO, SpinxCO=SpinxCO, SpinyCO=SpinyCO, SpinzCO=SpinzCO, ECC=ECC, PM=PM, IOTA=IOTA)
+
+            #生成波形
+            WaveDataOut(**kwargs)
+            
+            self.isWaveOK.set('波形已生成') 
+             
+
         except Exception as e:
             self.warningInformation(e)
+  
 
 
     def print_selection(self):
