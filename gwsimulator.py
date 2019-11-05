@@ -68,7 +68,7 @@ class Application():
     def sourceEMRIset(self):
             self.windowTemplateEMRI = tk.Toplevel(self.window)
             self.windowTemplateEMRI.title('EMRI参数设定')
-            self.windowTemplateEMRI.geometry('600x450')  # 这里的乘是小x 
+            self.windowTemplateEMRI.geometry('700x450')  # 这里的乘是小x 
 
             self.varMassBH = tk.StringVar(self.windowTemplateEMRI) 
             self.varSpinxBH = tk.StringVar(self.windowTemplateEMRI) 
@@ -82,8 +82,20 @@ class Application():
             self.varPM  = tk.StringVar(self.windowTemplateEMRI) 
             self.varIOTA = tk.StringVar(self.windowTemplateEMRI) 
 
+            #默认值
+            self.varMassBH.set('1e6') 
+            self.varSpinxBH.set('0') 
+            self.varSpinyBH.set('0') 
+            self.varSpinzBH.set('0.5') 
+            self.varMassCO.set('1e2') 
+            self.varSpinxCO.set('0') 
+            self.varSpinyCO.set('0')
+            self.varSpinzCO.set('0')          
+            self.varECC.set('0.5')
+            self.varPM.set('8.0')
+            self.varIOTA.set('0.25')
 
-            tk.Label(self.windowTemplateEMRI, text='MassBH',font=('Arial', 14)).grid(row=1, column=1, padx=10, pady=10, ipadx=10, ipady=10)
+            tk.Label(self.windowTemplateEMRI, text='MassBH (Mass_Sun)',font=('Arial', 10)).grid(row=1, column=1, padx=10, pady=10, ipadx=10, ipady=10)
             self.InputMassBH = tk.Entry(self.windowTemplateEMRI, textvariable=self.varMassBH, show=None, font=('Arial', 12), width=12)  # 显示成明文形式
             self.InputMassBH.grid(row=1, column=2, padx=10, pady=10, ipadx=10, ipady=10)
        
@@ -99,7 +111,7 @@ class Application():
             self.InputSpinzBH = tk.Entry(self.windowTemplateEMRI, textvariable=self.varSpinzBH, show=None, font=('Arial', 12), width=12)  # 显示成明文形式
             self.InputSpinzBH.grid(row=4, column=2, padx=10, pady=10, ipadx=10, ipady=10)
 
-            tk.Label(self.windowTemplateEMRI, text='MassCO',font=('Arial', 14)).grid(row=1, column=3, padx=10, pady=10, ipadx=10, ipady=10)
+            tk.Label(self.windowTemplateEMRI, text='MassCO (Mass_Sun)',font=('Arial', 10)).grid(row=1, column=3, padx=10, pady=10, ipadx=10, ipady=10)
             self.InputMassCO = tk.Entry(self.windowTemplateEMRI, textvariable=self.varMassCO, show=None, font=('Arial', 12), width=12)  # 显示成明文形式
             self.InputMassCO.grid(row=1, column=4, padx=10, pady=10, ipadx=10, ipady=10)
 
@@ -119,13 +131,39 @@ class Application():
             self.InputECC = tk.Entry(self.windowTemplateEMRI, textvariable=self.varECC, show=None, font=('Arial', 12), width=12)  # 显示成明文形式
             self.InputECC.grid(row=5, column=2, padx=10, pady=10, ipadx=10, ipady=10)
 
-            tk.Label(self.windowTemplateEMRI, text='PM',font=('Arial', 14)).grid(row=6, column=1, padx=10, pady=10, ipadx=10, ipady=10) 
+            tk.Label(self.windowTemplateEMRI, text='PM (M)',font=('Arial', 14)).grid(row=6, column=1, padx=10, pady=10, ipadx=10, ipady=10) 
             self.InputPM = tk.Entry(self.windowTemplateEMRI, textvariable=self.varPM, show=None, font=('Arial', 12), width=12)  # 显示成明文形式
             self.InputPM .grid(row=6, column=2, padx=10, pady=10, ipadx=10, ipady=10)
 
-            tk.Label(self.windowTemplateEMRI, text='IOTA',font=('Arial', 14)).grid(row=7, column=1, padx=10, pady=10, ipadx=10, ipady=10)
+            tk.Label(self.windowTemplateEMRI, text='IOTA (PI)',font=('Arial', 14)).grid(row=7, column=1, padx=10, pady=10, ipadx=10, ipady=10)
             self.InputIOTA = tk.Entry(self.windowTemplateEMRI, textvariable=self.varIOTA, show=None, font=('Arial', 12), width=12)  # 显示成明文形式
             self.InputIOTA.grid(row=7, column=2, padx=10, pady=10, ipadx=10, ipady=10)
+
+            #确认按钮
+            self.coeffOK = tk.Button(self.windowTemplateEMRI, text='生成波形', width=10, height=2, command=self.waveform_making)
+            self.coeffOK.grid(row=6, column=4, padx=10, pady=10, ipadx=10, ipady=10)
+
+    #波形生成
+    def waveform_making(self):
+        try:
+            MassBH = float(self.varMassBH.get()) 
+            SpinxBH = float(self.varSpinxBH.get()) 
+            SpinyBH = float(self.varSpinyBH.get()) 
+            SpinzBH = float(self.varSpinzBH.get()) 
+            MassCO  = float(self.varMassCO.get())
+            SpinxCO = float(self.varSpinxCO.get()) 
+            SpinyCO = float(self.varSpinyCO.get())
+            SpinzCO = float(self.varSpinzCO.get())         
+            ECC = float(self.varECC.get())
+            PM = float(self.varPM.get())
+            IOTA = float(self.varIOTA.get())
+
+            with open('./coeff.dat','w') as f:
+                print(MassBH, SpinxBH, SpinyBH, SpinzBH, MassCO, SpinxCO, SpinyCO, SpinzCO, ECC, PM, IOTA, file=f)
+
+ 
+        except Exception as e:
+            self.warningInformation(e)
 
 
     def print_selection(self):
@@ -152,6 +190,10 @@ class Application():
 
     def sourceSelectWarning(self):
         messagebox.showinfo(title='提示', message= '请选择波源')
+
+    def warningInformation(self, e):
+        messagebox.showinfo(title='警告', \
+            message= e)
 
     def aboutInformation(self):
         messagebox.showinfo(title='空间引力波探测器仿真', \
