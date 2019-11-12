@@ -144,7 +144,7 @@ class teukolsky(waveform_template):
         self.caltimeVec = (timeVec).reshape(1, self.n)
 
         self.hlmk = np.tile(hlmk, self.n)
-        self.factor = 1#(self.D / self.R_unit) 恢复公有制下大小
+        self.factor = (self.D / self.R_unit)# 恢复公有制下大小 #1
         wave = (2.0 / self.factor ) *  self.hlmk * np.e**(-1j * self.omega_mk@self.caltimeVec)
 
         wave = np.sum(wave, axis = 0)
@@ -215,7 +215,7 @@ class teukolsky(waveform_template):
 
         timea = time.time()
         hlmk_Vec = []
-        calStep = 10000 # call harmonic every calStep step
+        calStep = 1000000 # call harmonic every calStep step
         for i in range(self.n):
             if ((i % calStep) == 0 ):    
                 ans = np.array([harmonic(self.atilde, self.nu, self.p_Vec[i]/ self.R_unit, self.e_Vec[i], l, l, self.k) for l in self.l])
@@ -232,7 +232,7 @@ class teukolsky(waveform_template):
         # See Ref.2 III (1)
 
         self.cn = len(self.omega_mkMat)   #column m
-        self.factor = 1#(self.D / self.R_unit) 恢复公有制下大小
+        self.factor = (self.D / self.R_unit) #1  恢复公有制下大小
         self.phiMat = np.cumsum(self.omega_mkMat * (self.delta_t/self.t_unit), axis = 1)
    
         wave = (2.0 / self.factor ) *  self.hlmkMat * np.e**(-1j * self.phiMat) #evolve  Delta phi = int_ w dt
