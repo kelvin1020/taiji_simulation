@@ -138,21 +138,26 @@ def WaveDataOut(**kwargs):
 # In[ ]:
 
 
-MassBH    = 1e6
-SpinxBH   = 0
-SpinyBH   = 0
-SpinzBH   = 0.9
-MassCO    = 1e1
-SpinxCO   = 0 
-SpinyCO   = 0
-SpinzCO   = 90
-ECC       = 0.5
-PM        = 20
-IOTA      = 0.25
+
+if __name__ == '__main__':
+    
+
+    MassBH    = 1e6
+    SpinxBH   = 0
+    SpinyBH   = 0
+    SpinzBH   = 0.9
+    MassCO    = 1e1
+    SpinxCO   = 0 
+    SpinyCO   = 0
+    SpinzCO   = 90
+    ECC       = 0.5
+    PM        = 20
+    IOTA      = 0.25
 
 
-kwargs = dict(MassBH=MassBH, SpinxBH=SpinxBH, SpinyBH=SpinyBH, SpinzBH=SpinzBH,     MassCO=MassCO, SpinxCO=SpinxCO, SpinyCO=SpinyCO, SpinzCO=SpinzCO, ECC=ECC, PM=PM, IOTA=IOTA)
+    kwargs = dict(MassBH=MassBH, SpinxBH=SpinxBH, SpinyBH=SpinyBH, SpinzBH=SpinzBH,     MassCO=MassCO, SpinxCO=SpinxCO, SpinyCO=SpinyCO, SpinzCO=SpinzCO, ECC=ECC, PM=PM, IOTA=IOTA)
 
-wave = WaveDataOut(**kwargs)
-wave.to_csv('waveDataEMRIyear.dat')# columns=['JDTimeTCB']  #导出csv文件
+    wave = WaveDataOut(**kwargs)
+    wave.to_csv('waveDataEMRIyear.dat')# columns=['JDTimeTCB']  #导出csv文件
+
 
