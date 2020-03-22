@@ -1,0 +1,15 @@
+name: taiji_simulation
+channels:
+  - conda-forge
+dependencies:
+  - python=3
+  - numpy
+  - pip
+  - pip:
+    - matplotlib
+    - moviepy
+    - astropy
+    - scipy
+    - lalsuite
+    - pycbc
+    - ligo.skymap

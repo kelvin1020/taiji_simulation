@@ -21,12 +21,11 @@ from mpl_toolkits.mplot3d import Axes3D
 from moviepy.video.io.bindings import mplfig_to_npimage#动图生成
 import moviepy.editor as mpy
 
-####teukolsky
-from lib.waveform import teukolsky
-from lib.waveform import get_td_waveform
-
 from scipy.interpolate import interp1d
 
+####private
+from lib.waveform import teukolsky
+from lib.waveform import get_td_waveform
 
 # Constants
 G = (const.G).value # gravitational constant
@@ -98,7 +97,7 @@ def Fcross2(theta, phi, psi):
 
 def WaveDataOut(**kwargs):
     #   Parameters
-    duration = 86400 * 365          #信号持续时间(duration of signal) 2^16, 0.75d, 2^25 ,1.06yr
+    duration = kwargs['DURATION']         #信号持续时间(duration of signal) 2^16, 0.75d, 2^25 ,1.06yr
     step = 4
 
     atilde = np.sqrt(kwargs['SpinxBH']**2 + kwargs['SpinyBH']**2 + kwargs['SpinzBH']**2)  # 自旋参量
@@ -131,7 +130,7 @@ def WaveDataOut(**kwargs):
     hcVec =  (np.array(hc)).reshape(-1, 1)
     waveMat = np.concatenate((timeVec, hpVec, hcVec), axis = 1)
     waveData = pd.DataFrame(waveMat, columns = ['timeSecond', 'hp', 'hc'])
-#     waveData.to_csv('waveDataEMRI.dat')# columns=['JDTimeTCB']  #导出csv文件
+    waveData.to_csv('waveDataEMRI.dat')# columns=['JDTimeTCB']  #导出csv文件
     return waveData
 
 #######探测器响应，依赖于探测器轨道数据#######################
@@ -206,30 +205,37 @@ if __name__ == '__main__':
     #####源位置###############
     NVec = np.array([[-0.21754308, -0.88794532, -0.40525068]]) #randUnitVec(1)
 
-    #####其他参数#############
-    # MassBH    = 1e6       
-    # SpinxBH   = 0
-    # SpinyBH   = 0
-    # SpinzBH   = 0.9
-    # MassCO    = 1e1
-    # SpinxCO   = 0 
-    # SpinyCO   = 0
-    # SpinzCO   = 90
-    # ECC       = 0.5
-    # PM        = 20
-    # IOTA      = 0.25
+    #####其他参数(波形)#############
+    MassBH    = 1e6       
+    SpinxBH   = 0
+    SpinyBH   = 0
+    SpinzBH   = 0.9
+    MassCO    = 1e1
+    SpinxCO   = 0 
+    SpinyCO   = 0
+    SpinzCO   = 90
+    ECC       = 0.5
+    PM        = 20
+    IOTA      = 0.25
 
-    # kwargs = dict(MassBH=MassBH, SpinxBH=SpinxBH, SpinyBH=SpinyBH, SpinzBH=SpinzBH, \
-    #     MassCO=MassCO, SpinxCO=SpinxCO, SpinyCO=SpinyCO, SpinzCO=SpinzCO, ECC=ECC, PM=PM, IOTA=IOTA)
+    DURATION = 86400 * 1          #信号持续时间(duration of signal, second) 
 
-    # wave = WaveDataOut(**kwargs)
+    ##########波形数据##############################################################################################
+    kwargs = dict(MassBH=MassBH, SpinxBH=SpinxBH, SpinyBH=SpinyBH, SpinzBH=SpinzBH, \
+        MassCO=MassCO, SpinxCO=SpinxCO, SpinyCO=SpinyCO, SpinzCO=SpinzCO, ECC=ECC, PM=PM, IOTA=IOTA, DURATION=DURATION)
 
-    wave =  pd.read_csv('./others/waveDataEMRImonth.dat', index_col = 0)  #读取csv文件
+    wave = WaveDataOut(**kwargs)
 
+    # wave =  pd.read_csv('./others/waveDataEMRImonth.dat', index_col = 0)  #也可读取csv文件
+    
     ##########太极轨道数据##############################################################################################
     orbitDataTAIJI  =  pd.read_csv('orbitData/orbitDataTAIJI.dat', index_col = 0)  #读取csv文件
 
     ans, thetaPhiPsi = orbitDataProcess(orbitDataTAIJI, NVec) #响应函数 pattern function 输出 timeVec, Fp1, Fc1, Fp2, Fc2
                                                               #以及源的theta, phi, psi
+    timeVec, Fp1, Fc1, Fp2, Fc2 = ans
+    theta, phi, psi = thetaPhiPsi
+
+
 
 

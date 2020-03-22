@@ -1,4 +1,5 @@
 .DS_Store
+waveDataEMRI.dat
 .ipynb_checkpoints/
 __pycache__
 *.pyc
